@@ -20,14 +20,14 @@ jobs:
             apt-get update &&
             DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential libsdl2-dev libgles2-mesa-dev &&
             mkdir -p out/forge &&
-            g++ -O2 -std=c++14 -Wall -o out/forge/forge src/main.cpp \$(sdl2-config --cflags) -lSDL2 -lGLESv2 -lm
+            g++ -O2 -std=c++14 -Wall -o out/forge/forge main.cpp \$(sdl2-config --cflags) -lSDL2 -lGLESv2 -lm
           "
 
       - name: Paket zusammenstellen
         run: |
           sudo chown -R "$USER" out
-          cp port/Forge.sh out/Forge.sh
-          cp port/controls.cfg out/forge/controls.cfg
+          cp Forge.sh out/Forge.sh
+          cp controls.cfg out/forge/controls.cfg
           chmod +x out/Forge.sh out/forge/forge
 
       - uses: actions/upload-artifact@v4
