@@ -1,0 +1,36 @@
+name: Build R36S
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Bauen (arm64, Ubuntu 18.04 = kompatibel mit ArkOS)
+        run: |
+          docker run --rm --platform linux/arm64 -v "$PWD":/work -w /work ubuntu:18.04 bash -c "
+            apt-get update &&
+            DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential libsdl2-dev libgles2-mesa-dev &&
+            mkdir -p out/forge &&
+            g++ -O2 -std=c++14 -Wall -o out/forge/forge src/main.cpp \$(sdl2-config --cflags) -lSDL2 -lGLESv2 -lm
+          "
+
+      - name: Paket zusammenstellen
+        run: |
+          sudo chown -R "$USER" out
+          cp port/Forge.sh out/Forge.sh
+          cp port/controls.cfg out/forge/controls.cfg
+          chmod +x out/Forge.sh out/forge/forge
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Forge-R36S
+          path: out
